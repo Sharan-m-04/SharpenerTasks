@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seller Admin Panel</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #f4f4f4;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.3rem;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .product-list {
+      margin-top: 2rem;
+    }
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 0.8rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 0.5rem;
+    }
+
+    .total-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-top: 2rem;
+      text-align: center;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <h1>Seller Admin Panel</h1>
+
+  <div class="form-group">
+    <label for="product-name">Product Name:</label>
+    <input type="text" id="product-name" placeholder="Enter product name">
+  </div>
+
+  <div class="form-group">
+    <label for="product-price">Product Price (in ₹):</label>
+    <input type="number" id="product-price" placeholder="Enter product price">
+  </div>
+
+  <button onclick="addProduct()">Add Product</button>
+
+  <div class="product-list" id="product-list"></div>
+
+  <div class="total-value" id="total-value">Total Stock Value: ₹0</div>
+
+  <script>
+    const API_BASE = "https://crudcrud.com/api/49234dd733214f988ea003296c3b4cb8/products";
+
+    const productList = document.getElementById("product-list");
+    const totalValueEl = document.getElementById("total-value");
+
+    let totalValue = 0;
+
+    window.onload = fetchProducts;
+
+    function fetchProducts() {
+      fetch(API_BASE)
+        .then(res => res.json())
+        .then(data => {
+          productList.innerHTML = "";
+          totalValue = 0;
+          data.forEach(product => {
+            totalValue += product.price;
+            displayProduct(product);
+          });
+          updateTotal();
+        });
+    }
+
+    function addProduct() {
+      const name = document.getElementById("product-name").value.trim();
+      const price = parseInt(document.getElementById("product-price").value.trim());
+
+      if (!name || isNaN(price) || price < 0) {
+        alert("Please enter valid product details.");
+        return;
+      }
+
+      const newProduct = { name, price };
+
+      fetch(API_BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newProduct)
+      })
+      .then(res => res.json())
+      .then(addedProduct => {
+        displayProduct(addedProduct);
+        totalValue += addedProduct.price;
+        updateTotal();
+      });
+
+      document.getElementById("product-name").value = "";
+      document.getElementById("product-price").value = "";
+    }
+
+    function displayProduct(product) {
+      const div = document.createElement("div");
+      div.className = "product-item";
+      div.setAttribute("data-id", product._id);
+
+      div.innerHTML = `
+        <span>${product.name} - ₹${product.price}</span>
+        <button onclick="deleteProduct('${product._id}', ${product.price})">Delete</button>
+      `;
+
+      productList.appendChild(div);
+    }
+
+    function deleteProduct(id, price) {
+      fetch(`${API_BASE}/${id}`, {
+        method: "DELETE"
+      })
+      .then(() => {
+        const item = document.querySelector(`[data-id="${id}"]`);
+        if (item) {
+          item.remove();
+        }
+        totalValue -= price;
+        updateTotal();
+      });
+    }
+
+    function updateTotal() {
+      totalValueEl.textContent = `Total Stock Value: ₹${totalValue}`;
+    }
+  </script>
+</body>
+</html>

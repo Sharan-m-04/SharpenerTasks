@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Expense Tracker</title>
+</head>
+<body>
+  <label for="expenseAmount">Choose Expenditure:</label>
+  <input type="number" id="expenseAmount"/>
+  
+  <label for="expenseDescription">Add a Description:</label>
+  <input type="text" id="expenseDescription"/>
+  
+  <label for="expenseCategory">Choose a Category:</label>
+  <select id="expenseCategory">
+    <option value="food">Food</option>
+    <option value="movie">Movie</option>
+    <option value="fuel">Fuel</option>
+    <option value="electricity">Electricity</option>
+  </select>
+  
+  <button id="addExpenseButton">Add Expense</button>
+
+  <ul id="expenseList"></ul>
+  
+  <script>
+    let savedExpenses = JSON.parse(localStorage.getItem("expenses")) || [];
+
+    function updateLocalStorage() {
+      localStorage.setItem("expenses", JSON.stringify(savedExpenses));
+    }
+
+    function createExpenseListItem(expense, index) {
+      const listItem = document.createElement("li");
+      listItem.textContent = `${expense.amount} - ${expense.category} - ${expense.description} `;
+
+      const deleteButton = document.createElement("button");
+      deleteButton.textContent = "Delete Expense";
+      deleteButton.addEventListener("click", function() {
+        savedExpenses.splice(index, 1);
+        updateLocalStorage();
+        renderExpenses();
+      });
+      listItem.appendChild(deleteButton);
+
+      const editButton = document.createElement("button");
+      editButton.textContent = "Edit Expense";
+      editButton.addEventListener("click", function() {
+        const newAmount = prompt("Enter new expenditure amount:", expense.amount);
+        const newDescription = prompt("Enter new description:", expense.description);
+        const newCategory = prompt("Enter new category (food, movie, fuel, electricity):", expense.category);
+        if(newAmount && newDescription && newCategory) {
+          expense.amount = newAmount;
+          expense.description = newDescription;
+          expense.category = newCategory.toLowerCase();
+          updateLocalStorage();
+          renderExpenses();
+        }
+      });
+      listItem.appendChild(editButton);
+
+      return listItem;
+    }
+
+    function renderExpenses() {
+      const expenseList = document.getElementById("expenseList");
+      expenseList.innerHTML = "";
+      savedExpenses.forEach((expense, index) => {
+        const listItem = createExpenseListItem(expense, index);
+        expenseList.appendChild(listItem);
+      });
+    }
+
+    document.getElementById("addExpenseButton").addEventListener("click", function() {
+      const expenseAmountInput = document.getElementById("expenseAmount");
+      const expenseDescriptionInput = document.getElementById("expenseDescription");
+      const expenseCategoryInput = document.getElementById("expenseCategory");
+
+      const expenseAmount = expenseAmountInput.value;
+      const expenseDescription = expenseDescriptionInput.value;
+      const expenseCategory = expenseCategoryInput.value;
+
+      if(expenseAmount === "" || expenseDescription === "") {
+        alert("Please fill out all fields.");
+        return;
+      }
+      
+      const newExpense = {
+        amount: expenseAmount,
+        description: expenseDescription,
+        category: expenseCategory
+      };
+
+      savedExpenses.push(newExpense);
+      updateLocalStorage();
+      renderExpenses();
+
+      expenseAmountInput.value = "";
+      expenseDescriptionInput.value = "";
+    });
+
+    renderExpenses();
+  </script>
+</body>
+</html>
