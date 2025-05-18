@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Day To Day Expenses</h1>
+    </header>
+
+    <main>
+      <div class="date-nav">
+        <button id="prevDate"><i class="fas fa-chevron-left"></i></button>
+        <div id="currentDate">Today</div>
+        <button id="nextDate"><i class="fas fa-chevron-right"></i></button>
+      </div>
+
+      <div class="summary-cards">        <div class="card income">
+          <div class="card-title">Income</div>
+          <div class="card-amount" id="incomeAmount">₹0.00</div>
+        </div>
+        <div class="card expenses">
+          <div class="card-title">Expenses</div>
+          <div class="card-amount" id="expenseAmount">₹0.00</div>
+        </div>
+        <div class="card balance">
+          <div class="card-title">Balance</div>
+          <div class="card-amount" id="balanceAmount">₹0.00</div>
+        </div>
+      </div>
+
+      <div class="view-selector">
+        <button class="view-btn active" data-view="day">Daily</button>
+        <button class="view-btn" data-view="month">Monthly</button>
+        <button class="view-btn" data-view="year">Yearly</button>
+        <button class="view-btn" data-view="chart">Charts</button>
+      </div>
+
+      <div class="view-content" id="dayView">
+        <div class="transaction-list" id="transactionList">
+          <div class="empty-state">
+            No transactions for today. Click the + button to add.
+          </div>
+        </div>
+      </div>
+
+      <div class="view-content hidden" id="monthView">
+        <div class="month-selector">
+          <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+          <div id="currentMonth">May 2025</div>
+          <button id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="transaction-list" id="monthlyTransactionList">
+        </div>
+      </div>
+
+      <div class="view-content hidden" id="yearView">
+        <div class="year-selector">
+          <button id="prevYear"><i class="fas fa-chevron-left"></i></button>
+          <div id="currentYear">2025</div>
+          <button id="nextYear"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        <div class="transaction-list" id="yearlyTransactionList">
+        </div>
+      </div>
+
+      <div class="view-content hidden" id="chartView">
+        <div class="chart-selector">
+          <button class="chart-btn active" data-type="expense">Expenses</button>
+          <button class="chart-btn" data-type="income">Income</button>
+        </div>
+        <div class="chart-container">
+          <canvas id="pieChart"></canvas>
+          <div class="no-data-message hidden">No data available for the selected period</div>
+        </div>
+      </div>
+      <div class="action-buttons">
+        <button id="addButton" class="add-button">
+          <i class="fas fa-plus"></i>
+        </button>
+        <button id="exportButton" class="export-button">
+          <i class="fas fa-file-export"></i>
+        </button>
+      </div>
+    </main>
+
+    <div id="addModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Add Transaction</h2>
+        <form id="transactionForm">
+          <div class="form-group">
+            <label>Type</label>
+            <div class="type-selector">
+              <button type="button" class="type-btn active" data-type="expense">Expense</button>
+              <button type="button" class="type-btn" data-type="income">Income</button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="amount">Amount</label>
+            <input type="number" id="amount" step="0.01" min="0.01" required>
+          </div>
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" id="description" required>
+          </div>
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select id="category">
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="date">Date</label>
+            <input type="date" id="date" required>
+          </div>
+          <button type="submit" class="submit-btn">Add</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="exportModal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2>Export Report</h2>
+        <form id="exportForm">
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" required>
+          </div>
+          <div class="form-group">
+            <label for="endDate">End Date</label>
+            <input type="date" id="endDate" required>
+          </div>
+          <button type="submit" class="submit-btn">Generate PDF</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="pdfModal" class="modal">
+      <div class="modal-content pdf-content">
+        <span class="close-modal">&times;</span>
+        <h2>Your PDF Report</h2>
+        <div class="pdf-container">
+          <iframe id="pdfFrame" width="100%" height="500px"></iframe>
+        </div>
+        <div class="pdf-actions">
+          <a id="downloadPdf" href="#" class="submit-btn" target="_blank" download>Download PDF</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
